@@ -61,14 +61,16 @@ class MarmitonParser:
         ingredients_tag = self._soup.find(
             "div", class_="mrtn-recette_ingredients-items"
         )
-        ingredients = []
+        if not ingredients_tag:
+            return []
 
-        for ingredient_tag in ingredients_tag.find_all("div", class_="card-ingredient"):
-            ingredient = self.__parse_ingredient(ingredient_tag)
-            if ingredient:
-                ingredients.append(ingredient)
-
-        return ingredients
+        return [
+            ingredient
+            for ingredient_tag in ingredients_tag.find_all(
+                "div", class_="card-ingredient"
+            )
+            if (ingredient := self.__parse_ingredient(ingredient_tag))
+        ]
 
     @staticmethod
     def __parse_ingredient(tag: Tag) -> Optional[Ingredient]:
@@ -91,16 +93,16 @@ class MarmitonParser:
 
     def __parse_instructions(self) -> List[Instruction]:
         instructions_tag = self._soup.find("div", class_="recipe-step-list")
-        instructions = []
+        if not instructions_tag:
+            return []
 
-        for step_number, instruction_tag in enumerate(
-            instructions_tag.find_all("div", class_="recipe-step-list__container")
-        ):
-            instruction = self.__parse_instruction(instruction_tag)
-            if instruction:
-                instructions.append(Instruction(step_number + 1, instruction))
-
-        return instructions
+        return [
+            Instruction(step_number + 1, instruction)
+            for step_number, instruction_tag in enumerate(
+                instructions_tag.find_all("div", class_="recipe-step-list__container")
+            )
+            if (instruction := self.__parse_instruction(instruction_tag))
+        ]
 
     @staticmethod
     def __parse_instruction(tag: Tag) -> Optional[str]:
