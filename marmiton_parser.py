@@ -38,6 +38,7 @@ class MarmitonParser:
             time_details = self._soup.find("div", class_="time__details")
             prep_time_tag = time_details.div.div.string
             cook_time_tag = time_details.div.find_next_siblings().pop().div.string
+
             return prep_time_tag, cook_time_tag
         except Exception as e:
             logger.error(f"Failed to parse recipe times: {e}")
@@ -48,6 +49,7 @@ class MarmitonParser:
             servings_tag = self._soup.find(
                 "div", class_="mrtn-recette_ingredients-counter"
             )
+
             return int(servings_tag["data-servingsnb"])
         except Exception as e:
             logger.error(f"Failed to parse servings from tag {servings_tag}: {e}")
@@ -86,6 +88,7 @@ class MarmitonParser:
             quantity = quantity if quantity > 0 else None
             unit = tag.find("span", class_="unit")["data-unitsingular"]
             unit = unit if len(unit) > 0 else None
+
             return Ingredient(name, quantity, unit)
         except Exception as e:
             logger.error(f"Failed to parse ingredient from tag {tag}: {e}")

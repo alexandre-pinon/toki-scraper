@@ -2,7 +2,7 @@ from flask import Request, abort, jsonify
 from flask.typing import ResponseReturnValue
 from flask_cors import cross_origin
 from dataclasses import asdict
-from marmiton_parser import MarmitonParser
+from recipe_parser import RecipeParserFactory
 import functions_framework
 import logging
 import requests
@@ -24,14 +24,15 @@ def extract_recipe(request: Request) -> ResponseReturnValue:
 
     try:
         html = fetch(body["url"])
+        parser = RecipeParserFactory.create_parser(body["url"], html)
+        recipe = parser.parse_recipe()
+
+        return asdict(recipe)
+    except ValueError as e:
+        abort(400, description=str(e).lower())
     except Exception as e:
-        logger.error(f"Failed to fetch url: {body["url"]}\nReason: {e}")
-        abort(500, description="request failed")
-
-    parser = MarmitonParser(html, body["url"])
-    recipe = parser.parse_recipe()
-
-    return asdict(recipe)
+        logger.error(e)
+        abort(500, description="failed to extract recipe")
 
 
 @functions_framework.errorhandler(400)
