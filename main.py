@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 @functions_framework.http
 @cross_origin(methods="POST")
-def extract_recipe(request: Request) -> ResponseReturnValue:
+def scrape_recipe(request: Request) -> ResponseReturnValue:
     body = request.get_json(silent=True)
 
     if not body or "url" not in body:
