@@ -29,7 +29,7 @@ def scrape_recipe(request: Request) -> ResponseReturnValue:
 
         return asdict(recipe)
     except ValueError as e:
-        abort(400, description=str(e).lower())
+        abort(422, description=str(e).lower())
     except Exception as e:
         logger.error(e)
         abort(500, description="failed to extract recipe")
